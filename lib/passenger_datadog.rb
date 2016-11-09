@@ -46,5 +46,30 @@ class PassengerDatadog
         end
       end
     end
+
+    def parse(status)
+      metrics = []
+      status = status.split("\n")[3..-1].join("\n") unless status.start_with?('<?xml')
+      parsed = Nokogiri::XML(status)
+      pool_used = parsed.xpath('//process_count').text
+      metrics << ['passenger.pool.used', pool_used]
+      pool_max = parsed.xpath('//max').text
+      metrics << ['passenger.pool.max', pool_max]
+      request_queue = parsed.xpath('//supergroups/supergroup/group/get_wait_list_size').text
+      metrics << ['passenger.request_queue', request_queue]
+      parsed.xpath('//supergroups/supergroup/group').each do |group|
+        GROUP_STATS.each do |stat|
+          value = group.xpath(stat).text
+          next if value.empty?
+          metrics << ["passenger.#{stat}", value]
+        end
+      end
+
+      metrics
+    end
+
+    def send_metrics(metrics)
+
+    end
   end
 end

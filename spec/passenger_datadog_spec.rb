@@ -153,4 +153,51 @@ describe PassengerDatadog do
       described_class.run
     end
   end
+
+  context 'passenger 5 tom' do
+    before do
+      allow(described_class).to receive(:`).and_return(File.read('spec/fixtures/passenger_5_status.xml'))
+    end
+    
+    let(:metrics) do
+      [
+        ['passenger.pool.used', '2'],
+        ['passenger.pool.max', '5'], 
+        ['passenger.request_queue', '0'],
+        ['passenger.capacity_used', '2'],
+        ['passenger.processes_being_spawned', '0'],
+        ['passenger.enabled_process_count', '2'],
+        ['passenger.disabling_process_count', '0'],
+        ['passenger.disabled_process_count', '0'],
+
+        ['passenger.processed', '2', { :tags => ['passenger-process:0'] }],
+        ['passenger.sessions', '0', { :tags => ['passenger-process:0'] }],
+        ['passenger.busyness', '0', { :tags => ['passenger-process:0'] }],
+        ['passenger.concurrency', '1', { :tags => ['passenger-process:0'] }],
+        ['passenger.cpu', '0', { :tags => ['passenger-process:0'] }],
+        ['passenger.rss', '409596', { :tags => ['passenger-process:0'] }],
+        ['passenger.private_dirty', '126456', { :tags => ['passenger-process:0'] }],
+        ['passenger.pss', '267231', { :tags => ['passenger-process:0'] }],
+        ['passenger.swap', '0', { :tags => ['passenger-process:0'] }],
+        ['passenger.real_memory', '126456', { :tags => ['passenger-process:0'] }],
+        ['passenger.vmsize', '812632', { :tags => ['passenger-process:0'] }],
+
+        ['passenger.processed', '3', { :tags => ['passenger-process:1'] }],
+        ['passenger.sessions', '0', { :tags => ['passenger-process:1'] }],
+        ['passenger.busyness', '0', { :tags => ['passenger-process:1'] }],
+        ['passenger.concurrency', '1', { :tags => ['passenger-process:1'] }],
+        ['passenger.cpu', '0', { :tags => ['passenger-process:1'] }],
+        ['passenger.rss', '407972', { :tags => ['passenger-process:1'] }],
+        ['passenger.private_dirty', '124832', { :tags => ['passenger-process:1'] }],
+        ['passenger.pss', '265607', { :tags => ['passenger-process:1'] }],
+        ['passenger.swap', '0', { :tags => ['passenger-process:1'] }],
+        ['passenger.real_memory', '124832', { :tags => ['passenger-process:1'] }],
+        ['passenger.vmsize', '812536', { :tags => ['passenger-process:1'] }]
+      ]
+    end
+
+    it 'parses passenger status' do
+      expect(described_class.parse(File.read('spec/fixtures/passenger_5_status.xml'))).to eq(metrics)
+    end
+  end
 end
